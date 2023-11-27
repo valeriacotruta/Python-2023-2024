@@ -1,0 +1,5 @@
+Name,Age,Email
+John Doe,hello,johndoe@example.com
+Alice Smith,25,alice.smith@example.com
+Bob,,bob@example.com
+Eve Jones,not_an_age,eve@example.com
