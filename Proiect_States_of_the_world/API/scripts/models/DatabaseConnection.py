@@ -12,10 +12,6 @@ class DatabaseConnection:
             if self.mysql_database_connection.is_connected():
                 database_response = self.mysql_database_connection.get_server_info()
                 print("Your connection to the database succeed!")
-                # connection_cursor = self.mysql_database_connection.cursor()
-                # connection_cursor.execute("select database();")
-                # record = connection_cursor.fetchone()
-                # print("You're connected to database: ", record)
         except Error as exception:
             print("Your connection to the database failed!", exception)
 
