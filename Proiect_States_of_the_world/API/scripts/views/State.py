@@ -1,6 +1,7 @@
 class State:
-    def __init__(self, name, capital_name, population, density, surface, neighbours, spoken_languages, time_zones,
-                 political_regime):
+    def __init__(self, name, capital_name="", population=0, density=0.0, surface=0.0, neighbours=[],
+                 spoken_languages=[],
+                 time_zones=[], political_regime=""):
         self.id = 0
         self.name = name
         self.capital_name = capital_name

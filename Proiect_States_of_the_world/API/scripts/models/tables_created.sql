@@ -7,11 +7,17 @@ SHOW TABLES;
 desc states;
 delete from states;
 delete from neighbours;
+delete from official_languages;
+delete from time_zones;
 
 SELECT * from states;
 SELECT * from neighbours;
 SELECT * from official_languages;
 SELECT * from time_zones;
+
+SELECT state_id FROM official_languages WHERE spoken_language LIKE "%Chinese%";
+SELECT state_id FROM time_zones WHERE time_zone LIKE "%UTC+09:00%";
+
 
 CREATE TABLE states (
     id INT PRIMARY KEY AUTO_INCREMENT,

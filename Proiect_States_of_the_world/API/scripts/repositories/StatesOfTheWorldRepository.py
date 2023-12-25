@@ -64,4 +64,69 @@ class StatesOfTheWorldRepository:
             state_id = connection_cursor.fetchall()
             return state_id[0][0]
         except Error as exception:
-            print("SELECT id FROM states WHERE name = %s failed!", exception)
+            print("SELECT id FROM states WHERE name ____ failed!", exception)
+
+    def get_top_10_states_by(self, argument):
+        try:
+            connection_cursor = self.database_connection.cursor()
+            query = f"SELECT * FROM states ORDER BY {argument} DESC LIMIT 10"
+            connection_cursor.execute(query)
+            rows = connection_cursor.fetchall()
+            return rows
+        except Error as exception:
+            print("SELECT * FROM states ORDER BY ____ failed!", exception)
+
+    def get_state_by_id(self, state_id):
+        try:
+            connection_cursor = self.database_connection.cursor()
+            query = "SELECT * FROM states WHERE id = %s"
+            values = (state_id,)
+            connection_cursor.execute(query, values)
+            state = connection_cursor.fetchone()
+            return state
+        except Error as exception:
+            print("SELECT * FROM states WHERE id ____ failed!", exception)
+
+    def get_states_by_language(self, language):
+        try:
+            connection_cursor = self.database_connection.cursor()
+            query = "SELECT state_id FROM official_languages WHERE spoken_language LIKE %s"
+            values = (("%" + language + "%"),)
+            connection_cursor.execute(query, values)
+            rows = connection_cursor.fetchall()
+            return [state_id[0] for state_id in rows]
+        except Error as exception:
+            print("SELECT state_id FROM official_languages WHERE spoken_language LIKE ____ failed!", exception)
+
+    def get_states_by_time_zone(self, time_zone):
+        try:
+            connection_cursor = self.database_connection.cursor()
+            query = "SELECT state_id FROM time_zones WHERE time_zone LIKE %s"
+            values = (("%" + time_zone + "%"),)
+            connection_cursor.execute(query, values)
+            rows = connection_cursor.fetchall()
+            return [state_id[0] for state_id in rows]
+        except Error as exception:
+            print("SELECT state_id FROM time_zones WHERE time_zone LIKE ____ failed!", exception)
+
+    def get_states_by_neighbour(self, neighbour):
+        try:
+            connection_cursor = self.database_connection.cursor()
+            query = "SELECT state_id FROM neighbours WHERE neighbour LIKE %s"
+            values = (("%" + neighbour + "%"),)
+            connection_cursor.execute(query, values)
+            rows = connection_cursor.fetchall()
+            return [state_id[0] for state_id in rows]
+        except Error as exception:
+            print("SELECT state_id FROM neighbours WHERE neighbour LIKE ____ failed!", exception)
+
+    def get_states_by_political_regime(self, political_regime):
+        try:
+            connection_cursor = self.database_connection.cursor()
+            query = "SELECT id, name FROM states WHERE political_regime LIKE %s"
+            values = (("%" + political_regime + "%"),)
+            connection_cursor.execute(query, values)
+            rows = connection_cursor.fetchall()
+            return rows
+        except Error as exception:
+            print("SELECT name FROM states WHERE political_regime LIKE ____ failed!", exception)

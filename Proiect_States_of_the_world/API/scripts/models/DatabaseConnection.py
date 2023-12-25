@@ -10,8 +10,8 @@ class DatabaseConnection:
                                                                      user='root',
                                                                      password='valeriacotruta')
             if self.mysql_database_connection.is_connected():
-                database_response = self.mysql_database_connection.get_server_info()
-                print("Your connection to the database succeed!")
+                pass
+                # print("Your connection to the database succeed!")
         except Error as exception:
             print("Your connection to the database failed!", exception)
 

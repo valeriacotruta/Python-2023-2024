@@ -1,13 +1,15 @@
-import CrawlerService as Cs
+from API.scripts.services import CrawlerService as Cs
 import re
 from API.scripts.repositories import StatesOfTheWorldRepository
 from API.scripts.views import State
+from API.scripts.responses import TopStateResponse, FoundStateResponse
 
 
 class StatesOfTheWorldService:
     def __init__(self):
         self.crawler_service = Cs.CrawlerService()
         self.states_dictionary = dict()
+        self.states_of_the_world_repository = StatesOfTheWorldRepository.StatesOfTheWorldRepository()
 
     def __add_missing_information(self, current_details_list_length, default_information):
         missing_population_states = [state for state in self.states_dictionary.keys() if
@@ -167,32 +169,62 @@ class StatesOfTheWorldService:
 
     def __build_state(self, state_name):
         state_details = self.states_dictionary.get(state_name)
-        if len(state_details) < 8:
-            return (state_name, state_details)
+        capital_name = state_details[0]
+        population = state_details[1]
+        density = state_details[2]
+        surface = state_details[3]
+        neighbours = state_details[4]
+        spoken_languages = state_details[5]
+        time_zones = state_details[6]
+        political_regime = state_details[7]
+        return State.State(state_name, capital_name, population, density, surface, neighbours,
+                           spoken_languages, time_zones, political_regime)
+
+    def insert_all_data(self):
+        try:
+            for state_name in self.states_dictionary.keys():
+                new_state = self.__build_state(state_name)
+                self.states_of_the_world_repository.insert_new_state(new_state)
+                new_state.id = self.states_of_the_world_repository.get_state_id(state_name)
+                print(new_state)
+                self.states_of_the_world_repository.insert_state_neighbours(new_state)
+                self.states_of_the_world_repository.insert_state_official_languages(new_state)
+                self.states_of_the_world_repository.insert_state_time_zones(new_state)
+            return True
+        except Exception as exception:
+            return exception
+
+    def get_to_10_states_by(self, argument):
+        top_10_states = self.states_of_the_world_repository.get_top_10_states_by(argument)
+        top_10_states_list = list()
+        current_state = None
+        for state in top_10_states:
+            name = state[1]
+            if argument == "population":
+                current_state = TopStateResponse.TopStateResponse(name, "Populatie", state[3])
+            elif argument == "density":
+                current_state = TopStateResponse.TopStateResponse(name, "Densitate", state[4])
+            elif argument == "surface":
+                current_state = TopStateResponse.TopStateResponse(name, "Suprafata", state[5])
+            top_10_states_list.append(current_state.__dict__())
+        return top_10_states_list
+
+    def get_states_by(self, argument, argument_value):
+        found_states = None
+        if argument == "language":
+            found_states = self.states_of_the_world_repository.get_states_by_language(argument_value)
+        elif argument == "time_zone":
+            found_states = self.states_of_the_world_repository.get_states_by_time_zone(argument_value)
+        elif argument == "neighbour":
+            found_states = self.states_of_the_world_repository.get_states_by_neighbour(argument_value)
+        if argument == "political_regime":
+            states_found_by_id = self.states_of_the_world_repository.get_states_by_political_regime(argument_value)
         else:
-            capital_name = state_details[0]
-            population = state_details[1]
-            density = state_details[2]
-            surface = state_details[3]
-            neighbours = state_details[4]
-            spoken_languages = state_details[5]
-            time_zones = state_details[6]
-            political_regime = state_details[7]
-            return State.State(state_name, capital_name, population, density, surface, neighbours,
-                               spoken_languages, time_zones, political_regime)
-
-    def insertAllData(self):
-        states_of_the_world_repository = StatesOfTheWorldRepository.StatesOfTheWorldRepository()
-        for state_name in self.states_dictionary.keys():
-            new_state = self.__build_state(state_name)
-            states_of_the_world_repository.insert_new_state(new_state)
-            new_state.id = states_of_the_world_repository.get_state_id(state_name)
-            print(new_state)
-            states_of_the_world_repository.insert_state_neighbours(new_state)
-            states_of_the_world_repository.insert_state_official_languages(new_state)
-            states_of_the_world_repository.insert_state_time_zones(new_state)
-
-
-x = StatesOfTheWorldService()
-x.create_records()
-x.insertAllData()
+            states_found_by_id = list(
+                map(lambda state_id: self.states_of_the_world_repository.get_state_by_id(state_id),
+                    found_states))
+        found_states_list = list()
+        for state in states_found_by_id:
+            current_state = FoundStateResponse.FoundStateResponse(state[0], state[1])
+            found_states_list.append(current_state.__dict__())
+        return found_states_list
