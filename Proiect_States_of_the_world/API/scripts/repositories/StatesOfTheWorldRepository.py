@@ -3,11 +3,55 @@ from mysql.connector import Error
 
 
 class StatesOfTheWorldRepository:
+    """
+    A  class that represents the repository of the API. The direct operations with database are done here.
+
+    Attributes
+    __________
+    database : DatabaseConnection
+        an instance of the DatabaseConnection class
+    database_connection : MySQLConnection
+        an instance of the connection with the database
+
+    Methods
+    _______
+    insert_new_state(self, state):
+        Inserts a new state in the database.
+    insert_state_neighbours(self, state):
+        Inserts the neighbours of a state in the database.
+    insert_state_official_languages(self, state):
+        Inserts the official languages of a state in the database.
+    insert_state_time_zones(self, state):
+        Inserts the time zones of a state in the database.
+    get_state_id(self, state_name):
+        Returns the id of a state from the database.
+    get_top_10_states_by(self, argument):
+        Returns the top 10 states from the database, based on the argument.
+    get_state_by_id(self, state_id):
+        Returns the state by id from the database.
+    get_states_by_language(self, language):
+        Returns all the states from the database, based on the language.
+    get_states_by_time_zone(self, time_zone):
+        Returns all the states from the database, based on the time zone.
+    get_states_by_neighbour(self, neighbour):
+        Returns all the states from the database, based on the neighbour.
+    get_states_by_political_regime(self, political_regime):
+        Returns all the states from the database, based on the political regime.
+    """
     def __init__(self):
+        """
+        Constructs all the necessary attributes for the StatesOfTheWorldRepository object.
+
+        """
         self.database = Db.DatabaseConnection()
         self.database_connection = self.database.get_database_connection()
 
     def insert_new_state(self, state):
+        """
+        Inserts a new state in the database.
+        :param state: State
+        :return: None
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "INSERT INTO states (name, capital_name, population, density, surface, political_regime)VALUES(%s, %s, %s, %s, %s, %s)"
@@ -20,6 +64,12 @@ class StatesOfTheWorldRepository:
             print("The insertion into states table failed!", exception)
 
     def insert_state_neighbours(self, state):
+        """
+        Inserts the neighbours of a state in the database.
+
+        :param state: State
+        :return: None
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             for neighbour in state.neighbours:
@@ -32,6 +82,12 @@ class StatesOfTheWorldRepository:
             print("The insertion into neighbours table failed!", exception)
 
     def insert_state_official_languages(self, state):
+        """
+        Inserts the official languages of a state in the database.
+
+        :param state: State
+        :return: None
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             for language in state.spoken_languages:
@@ -44,6 +100,12 @@ class StatesOfTheWorldRepository:
             print("The insertion into official_languages table failed!", exception)
 
     def insert_state_time_zones(self, state):
+        """
+        Inserts the time zones of a state in the database.
+
+        :param state: State
+        :return: None
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             for time_zone in state.time_zones:
@@ -56,6 +118,12 @@ class StatesOfTheWorldRepository:
             print("The insertion into time_zones table failed!", exception)
 
     def get_state_id(self, state_name):
+        """
+        Returns the id of a state from the database.
+
+        :param state_name: the name of the state
+        :return: None
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "SELECT id FROM states WHERE name = %s"
@@ -67,6 +135,12 @@ class StatesOfTheWorldRepository:
             print("SELECT id FROM states WHERE name ____ failed!", exception)
 
     def get_top_10_states_by(self, argument):
+        """
+        Returns the top 10 states from the database, based on the argument.
+
+        :param argument: "population", "density" or "surface"
+        :return: list
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = f"SELECT * FROM states ORDER BY {argument} DESC LIMIT 10"
@@ -77,6 +151,12 @@ class StatesOfTheWorldRepository:
             print("SELECT * FROM states ORDER BY ____ failed!", exception)
 
     def get_state_by_id(self, state_id):
+        """
+        Returns the state by id from the database.
+
+        :param state_id: the id of the state
+        :return: Optional
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "SELECT * FROM states WHERE id = %s"
@@ -88,6 +168,12 @@ class StatesOfTheWorldRepository:
             print("SELECT * FROM states WHERE id ____ failed!", exception)
 
     def get_states_by_language(self, language):
+        """
+        Returns all the states from the database, based on the language.
+
+        :param language: the language we search the states by
+        :return: list
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "SELECT state_id FROM official_languages WHERE spoken_language LIKE %s"
@@ -99,6 +185,12 @@ class StatesOfTheWorldRepository:
             print("SELECT state_id FROM official_languages WHERE spoken_language LIKE ____ failed!", exception)
 
     def get_states_by_time_zone(self, time_zone):
+        """
+        Returns all the states from the database, based on the time zone.
+
+        :param time_zone: the time zone we search by
+        :return: list
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "SELECT state_id FROM time_zones WHERE time_zone LIKE %s"
@@ -110,6 +202,12 @@ class StatesOfTheWorldRepository:
             print("SELECT state_id FROM time_zones WHERE time_zone LIKE ____ failed!", exception)
 
     def get_states_by_neighbour(self, neighbour):
+        """
+        Returns all the states from the database, based on the neighbour.
+
+        :param neighbour: the neighbour we search by
+        :return: list
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "SELECT state_id FROM neighbours WHERE neighbour LIKE %s"
@@ -121,6 +219,12 @@ class StatesOfTheWorldRepository:
             print("SELECT state_id FROM neighbours WHERE neighbour LIKE ____ failed!", exception)
 
     def get_states_by_political_regime(self, political_regime):
+        """
+        Returns all the states from the database, based on the political regime.
+
+        :param political_regime: the political regime we search by
+        :return: list
+        """
         try:
             connection_cursor = self.database_connection.cursor()
             query = "SELECT id, name FROM states WHERE political_regime LIKE %s"

@@ -41,10 +41,10 @@ def get_states_by_language():
 @app.route('/insert-all-data', methods=['POST'])
 def insert_all_data():
     if StatesController.insert_all_data():
-        return jsonify("All the data was inserted with success!")
+        return jsonify("All the data were inserted with success!")
     else:
         return jsonify("A problem has occurred!")
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=8080)

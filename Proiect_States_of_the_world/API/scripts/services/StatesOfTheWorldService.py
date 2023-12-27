@@ -6,12 +6,90 @@ from API.scripts.responses import TopStateResponse, FoundStateResponse
 
 
 class StatesOfTheWorldService:
+    """
+          A class used to manage specific operations regarding the parsing of the states' details,
+          insertion of specific information into the database or getting responses from the database.
+
+          Attributes
+          ----------
+          crawler_service : CrawlerService
+              an instance of the CrawlerService class
+          states_dictionary : dict
+              a dictionary where will be parsed all the information by the state's name
+          states_of_the_world_repository : StatesOfTheWorldRepository
+              an instance of the StatesOfTheWorldRepository class
+
+          Methods
+          -------
+          __add_missing_information(self, current_details_list_length, default_information):
+              Adds missing information about the states that are in the states_dictionary,
+               but are not found on a specific table.
+          __parse_capitals(self, capitals_table):
+              Parses capitals from the capitals_table and adds them to the value-list of the key-state.
+          __parse_population_values(self, population_table):
+              Parses the numbers of the population from the population_table
+              and adds them to the value-list of the key-state.
+          __parse_density_values(self, density_table):
+              Parses the density values from the density_table
+              and adds them to the value-list of the key-state.
+          __parse_surface_value(self, surface_table):
+              Parses the surface values from the surface_table
+              and adds them to the value-list of the key-state.
+          __parse_neighbours(self, neighbours_table):
+              Parses the neighbours' list from the neighbours_table
+              and adds them to the value-list of the key-state.
+          __parse_official_languages(self, official_languages_table):
+              Parses the list of official languages from the official_languages_table
+              and adds them to the value-list of the key-state.
+          __parse_time_zones(self, time_zones_table):
+              Parses the list of time zones from the time_zones_table
+              and adds them to the value-list of the key-state.
+          __parse_systems_of_government(self, systems_of_government_table):
+              Parses the list of political regimes from the systems_of_government_table
+              and adds them to the value-list of the key-state.
+           create_records(self):
+              Parses all the data to the states_dictionary based on specific websites and tables.
+              Uses the functions above.
+           __build_state(self, state_name):
+               Creates an instance of the State class.
+           insert_all_data(self):
+               Inserts all data into the database.
+           get_to_10_states_by(self, argument):
+               Gets a response of top 10 states based on an argument.
+           get_states_by(self, argument, argument_value):
+               Gets a response about all the states, based on an argument and its value.
+          """
+
     def __init__(self):
+        """
+        Constructs all the necessary attributes for the StatesOfTheWorldService object.
+
+        Parameters
+        __________
+         crawler_service : CrawlerService
+              an instance of the CrawlerService class
+          states_dictionary : dict
+              a dictionary where will be parsed all the information by the state's name
+          states_of_the_world_repository : StatesOfTheWorldRepository
+              an instance of the StatesOfTheWorldRepository class
+
+        """
         self.crawler_service = Cs.CrawlerService()
         self.states_dictionary = dict()
         self.states_of_the_world_repository = StatesOfTheWorldRepository.StatesOfTheWorldRepository()
 
     def __add_missing_information(self, current_details_list_length, default_information):
+        """
+        Adds missing information about the states that are in the states_dictionary,
+        but are not found on a specific table.
+
+        :param current_details_list_length: the current length of the value list
+        of the key-states from the states_dictionary
+        :param default_information: the default value for the information like neighbours,
+        political regime, etc. (0, 0.0, "" or []).
+
+        :return: None
+        """
         missing_population_states = [state for state in self.states_dictionary.keys() if
                                      len(self.states_dictionary.get(state)) < current_details_list_length]
         for state in missing_population_states:
@@ -20,6 +98,14 @@ class StatesOfTheWorldService:
             self.states_dictionary.setdefault(state, state_details)
 
     def __parse_capitals(self, capitals_table):
+        """
+        Parses capitals from the capitals_table and adds them to the value-list(states_information)
+        of the key-state(state_name) of the states_dictionary.
+
+        :param capitals_table: the table where are parsed the rows for each state where we search for the capital name;
+            row[0] is the state name, row[1] is the capital of the state
+        :return: None
+        """
         for row in capitals_table:
             states_information = list()
             state_name = row[0].replace("\u202f*", "")
@@ -29,6 +115,14 @@ class StatesOfTheWorldService:
         print("Capitals parsed!")
 
     def __parse_population_values(self, population_table):
+        """
+        Parses the numbers of the population from the population_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param population_table:the table where are parsed the rows for each state where we search for the population number;
+            row[0] is the state name, row[1] is the population number of the state
+        :return: None
+        """
         for row in population_table:
             state_name = row[0]
             population_value = row[1].replace(",", "")
@@ -42,6 +136,14 @@ class StatesOfTheWorldService:
         print("Population values parsed!")
 
     def __parse_density_values(self, density_table):
+        """
+        Parses the values of the density from the density_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param density_table:the table where are parsed the rows for each state where we search for the density value;
+            row[0] is the state name, row[1] is the density value of the state
+        :return: None
+        """
         for row in density_table:
             state_name = row[0]
             density_value = row[1].replace(",", "")
@@ -55,6 +157,14 @@ class StatesOfTheWorldService:
         print("Density values parsed!")
 
     def __parse_surface_value(self, surface_table):
+        """
+        Parses the values of the surface from the surface_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param surface_table:the table where are parsed the rows for each state where we search for the surface value;
+            row[0] is the state name, row[2] is the surface of the state
+        :return:None
+        """
         for row in surface_table:
             state_name = row[1]
             surface_value = row[2].replace(",", "").split("(")[0]
@@ -68,6 +178,14 @@ class StatesOfTheWorldService:
         print("Surface values parsed!")
 
     def __parse_neighbours(self, neighbours_table):
+        """
+        Parses the list of the neighbours from the neighbours_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param neighbours_table: the table where are parsed the rows for each state where we search for the neighbours;
+            row[0] is the state name, row[5] is the list of the state's neighbours
+        :return: None
+        """
         for row in neighbours_table:
             pattern = r"(?:[A-Z][a-z\' ]+)+:"
             neighbours_list = [state[:-1] for state in re.findall(pattern, row[5])]
@@ -86,6 +204,14 @@ class StatesOfTheWorldService:
         print("Neighbours parsed!")
 
     def __parse_official_languages(self, official_languages_table):
+        """
+        Parses the official languages of the states from the official_languages_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param official_languages_table: the table where are parsed the rows for each state where we search for the
+            official languages of the state; row[0] is the state name, row[1] is the list of the official languages of the state
+        :return: None
+        """
         for row in official_languages_table:
             pattern = r"([A-Za-z]+\s?)"
             state_name = "".join(re.findall(pattern, row[0]))
@@ -100,6 +226,14 @@ class StatesOfTheWorldService:
         print("Languages parsed!")
 
     def __parse_time_zones(self, time_zones_table):
+        """
+        Parses the list of the time zones from the time_zones_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param time_zones_table:the table where are parsed the rows for each state where we search for the time zones;
+            row[0] is the state name, row[2] is the list of the time zones for each state found
+        :return: None
+        """
         for row in time_zones_table:
             state_name_pattern = r"([A-Za-z]+\s?)"
             time_zone_pattern = r"UTC\S+.*?(?=UTC|$)"
@@ -116,6 +250,15 @@ class StatesOfTheWorldService:
         print("Time zones parsed!")
 
     def __parse_systems_of_government(self, systems_of_government_table):
+        """
+        Parses the political regime from the systems_of_government_table and adds them to the
+        value-list(states_information) of the key-state(state_name) of the states_dictionary.
+
+        :param systems_of_government_table:the table where are parsed the rows for each state where we search for the political regime;
+            row[0] is the state name, row[1] is the political regime of each state
+
+        :return: None
+        """
         for row in systems_of_government_table:
             state_name = row[0]
             political_regime = row[1].replace("\xa0", " ")
@@ -130,6 +273,11 @@ class StatesOfTheWorldService:
         print(self.states_dictionary)
 
     def create_records(self):
+        """
+        Parses all the data to the states_dictionary based on specific websites and tables.
+
+        :return: None
+        """
         capitals_table = self.crawler_service.parse_states_by_capitals(
             "https://en.wikipedia.org/wiki/List_of_national_capitals_by_population", "wikitable")
         self.__parse_capitals(capitals_table)
@@ -168,6 +316,13 @@ class StatesOfTheWorldService:
         self.__parse_systems_of_government(systems_of_government_table)
 
     def __build_state(self, state_name):
+        """
+        Creates and returns a State object based on the name of a state. Gets all the information of the state from
+        the states_dictionary by its name.
+
+        :param state_name: the name of a state
+        :return: State
+        """
         state_details = self.states_dictionary.get(state_name)
         capital_name = state_details[0]
         population = state_details[1]
@@ -181,6 +336,11 @@ class StatesOfTheWorldService:
                            spoken_languages, time_zones, political_regime)
 
     def insert_all_data(self):
+        """
+        Inserts all the information into several tables of the database.
+
+        :return: Union[bool, Exception]
+        """
         try:
             for state_name in self.states_dictionary.keys():
                 new_state = self.__build_state(state_name)
@@ -195,6 +355,14 @@ class StatesOfTheWorldService:
             return exception
 
     def get_to_10_states_by(self, argument):
+        """
+         Gets a response of top 10 states from the database based on an argument.
+
+        :param argument: a string that represents the argument based on what do we get the states;
+        Its value can be: "population", "density" or "surface".
+
+        :return: list
+        """
         top_10_states = self.states_of_the_world_repository.get_top_10_states_by(argument)
         top_10_states_list = list()
         current_state = None
@@ -210,6 +378,16 @@ class StatesOfTheWorldService:
         return top_10_states_list
 
     def get_states_by(self, argument, argument_value):
+        """
+        Gets a response about all the states, based on an argument and its value, from teh database.
+
+        :param argument: a string that represents the argument based on what do we get the states;
+        Its value can be: "language", "time_zone" or "political_regime".
+
+        :param argument_value: the value of the argument
+
+        :return:list
+        """
         found_states = None
         if argument == "language":
             found_states = self.states_of_the_world_repository.get_states_by_language(argument_value)
