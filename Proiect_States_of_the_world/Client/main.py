@@ -11,7 +11,7 @@ def verify_error_code(result):
 
 if __name__ == "__main__":
     API_URL = "http://127.0.0.1:8080/"
-    print("Enter the endpoint. Enter \"quit\" if you want to exit.")
+    print("Enter the endpoint: ")
     endpoint = None
     while True:
         try:
